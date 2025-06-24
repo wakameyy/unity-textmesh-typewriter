@@ -1,0 +1,6 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Test/uxml/TestUXML.uss?fileID=7433441132597879392&amp;guid=1c12c2c69540b4b49b06e878c530c12f&amp;type=3#TestUXML" />
+    <engine:VisualElement style="flex-grow: 1;">
+        <engine:Label text="Labelsadfasdfasdfasdfasdfasdf" />
+    </engine:VisualElement>
+</engine:UXML>
