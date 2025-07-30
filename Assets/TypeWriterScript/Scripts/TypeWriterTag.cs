@@ -15,6 +15,7 @@ public class TypeWriterTag
     protected string m_tagType;
     [SerializeField]
     protected int m_index;
+    public string TagType => m_tagType;
     public int Index => m_index;
     [Serializable]
     public class TypeWriterTagArgument
