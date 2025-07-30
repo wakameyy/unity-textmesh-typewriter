@@ -22,6 +22,8 @@ public partial class TypeWriterScript : MonoBehaviour, ITextPreprocessor
         STOP,
         /// <summary> Skip</summary>
         SKIP,
+        /// <summary> コマンドの終了を待機</summary>
+        WAIT_COMMAND,
         /// <summary> 終了</summary>
         END,
     }
@@ -38,6 +40,8 @@ public partial class TypeWriterScript : MonoBehaviour, ITextPreprocessor
     private int m_displayedCharacterCount;
     /// <summary> 経過時間</summary>
     private float m_time = 0;
+    /// <summary> TypeWriterの稼働時間</summary>
+    private float m_typeWriteTime = 0;
     /// <summary> 倍速係数</summary>
     private float m_speedRatio = 1f;
     /// <summary> 終了コールバック</summary>
@@ -166,10 +170,18 @@ public partial class TypeWriterScript : MonoBehaviour, ITextPreprocessor
         m_textComponent.maxVisibleCharacters = m_displayedCharacterCount;
         OnEnd();
     }
+    public void WaitCommand()
+    {
+        m_state = State.WAIT_COMMAND;
+    }
 
     public bool IsPlaying()
     {
         return m_state == State.PLAYING;
+    }
+    public bool IsWaitCommand()
+    {
+        return m_state == State.WAIT_COMMAND;
     }
     private void OnEnd()
     {
@@ -181,24 +193,30 @@ public partial class TypeWriterScript : MonoBehaviour, ITextPreprocessor
 
     private void Update()
     {
-        if (!IsPlaying())
+        if (!IsPlaying() && !IsWaitCommand())
         {
             return;
         }
-
-        m_time += Time.deltaTime * m_speedRatio;
+        var deltaTime = Time.deltaTime;
+        m_time += deltaTime * m_speedRatio;
+        if (IsWaitCommand())
+        {
+            UpdateWaitCommand();
+            return;
+        }
+        m_typeWriteTime += deltaTime * m_speedRatio;
         // 文字カウントの閾値
         var threshold = 1f / m_numPerSec;
-        if (m_time < threshold)
+        if (m_typeWriteTime < threshold)
         {
             return;
         }
         // 経過時間が何文字分かをチェックする
-        var length = (int)(m_time / threshold);
+        var length = (int)(m_typeWriteTime / threshold);
         m_prevDisplayedCharacterCount = m_displayedCharacterCount;
         m_displayedCharacterCount += length;
         m_textComponent.maxVisibleCharacters = m_displayedCharacterCount;
-        m_time -= length * threshold;
+        m_typeWriteTime -= length * threshold;
 
         // すべての文字を読みこんだら
         if (m_textComponent.characterCount == m_displayedCharacterCount)
